@@ -1,0 +1,1 @@
+This is the UsbSerialForAndroid folder from the https://github.com/anotherlab/UsbSerialForAndroid repo.

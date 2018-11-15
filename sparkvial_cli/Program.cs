@@ -1,20 +1,13 @@
 ﻿using libsv;
-using libsv.InterfaceTypes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace sparkvial_cli
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine($"--- SparkVial CLI v1.0.0 / libsv v{SparkVial.Version} ---");
+namespace sparkvial_cli {
+    class Program {
+        static void Main(string[] args) {
+            Console.WriteLine($"--- SparkVial CLI v0.1.0 / libsv v{SparkVial.MajorVersion}.{SparkVial.MinorVersion}.{SparkVial.PatchVersion} ---");
             SparkVial sv = new SparkVial(new List<InterfaceType> {
-                new Win32SerialInterfaceType()
+                new svifs.win32.Win32SerialInterfaceType()
             });
 
             sv.OnInterfaceAdded += (Interface inf) => {
@@ -25,24 +18,43 @@ namespace sparkvial_cli
                 Console.WriteLine($"- Interface of type {inf.type} removed: {inf.id}");
             };
             sv.OnDeviceAdded += (Device dev) => {
-                Console.WriteLine($"- Device {dev.name} Added with serial number {dev.serialNum:X8}");
+                Console.WriteLine($"- Device '{dev.name}' added with serial number {dev.uniqueID:X8}");
+                dev.AdjustInterval(25);  // in ms
             };
             sv.OnDeviceRemoved += (Device dev) => {
-                Console.WriteLine($"- Device {dev.name} / {dev.serialNum:X8} Removed");
+                Console.WriteLine($"- Device '{dev.name}' with serial number {dev.uniqueID:X8} removed");
             };
-            //sv.OnDeviceValue += (Device dev, byte[] value) => {
-            //    Console.Write($"- Value from {dev.name} ({dev.serialNum:X8}) of size {value.Count()}:");
-            //    foreach (var c in value) {
-            //        Console.Write($" {c}");
-            //    }
-            //    Console.WriteLine();
-            //};
-            sv.OnDeviceValueFloat += (Device dev, float value) => {
-                Console.WriteLine($"- Value from {dev.name} ({dev.serialNum:X8}): {value}");
+            sv.OnSample += (dev, smp) => {
+                Console.WriteLine($"- Value from {dev.name} ({dev.uniqueID:X8}) with {smp.values.Count} fields at {smp.timestamp}ms:");
+                int i = 0;
+                foreach (var val in smp.values) {
+                    switch (dev.fields[i]) {
+                        case FieldType.ByteArray:
+                            Console.Write("  [");
+                            foreach (var b in (val as ByteArrayField).value) {
+                                Console.Write(b);
+                                Console.Write(", ");
+                            }
+                            Console.WriteLine("]");
+                            break;
+                        case FieldType.Int:
+                            Console.WriteLine($"  {Convert.ToInt64((val as IntField).value)}");
+                            break;
+                        case FieldType.Float:
+                            Console.WriteLine($"  {Convert.ToSingle((val as FloatField).value)}f");
+                            break;
+                        case FieldType.Double:
+                            Console.WriteLine($"  {Convert.ToDouble((val as DoubleField).value)}");
+                            break;
+                    }
+                    i++;
+                }
             };
 
-            sv.AutoScan = true;
+            sv.AutoScan = false;
             sv.AutoSample = true;
+
+            sv.Scan();
         }
     }
 }

@@ -2,111 +2,135 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
+using System.Collections;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace libsv {
     public class SparkVial {
-        public static readonly uint Version = 0; // even version = unstable
+        public const uint MajorVersion = 0;
+        public const uint MinorVersion = 1;
+        public const uint PatchVersion = 0;
+        public const byte ProtocolVersion = 0;
 
         public static readonly Dictionary<uint, string> productDB = new Dictionary<uint, string>() {
             { 0, "MISSING PRODUCT ID" },
-            { 1, "Example controller" },
-            { 2, "Example device" },
+            { 0 << 16 | 1, "Mock controller" },
+            { 0 << 16 | 2, "Mock device" },
+            { 1 << 16 | 1, "Example controller" },
+            { 1 << 16 | 2, "Example device" },
         };
+
+        public Thread scanningThread;
+        public Thread sampleThread;
 
         public SparkVial(List<InterfaceType> ifTypes) {
             interfaceTypes = ifTypes;
-            new Thread(ScanningThread).Start();
-            new Thread(SampleThread).Start();
         }
 
-        public void Scan() {
-            throw new NotImplementedException();
+        private async void HeartbeatInterface(Interface inf) {
+            if (inf.isEnabled) {
+                await inf.Heartbeat();
+            }
         }
 
-        public void GetValue() {
-            throw new NotImplementedException();
-        }
-        
-        void ScanningThread() {
-            while (true) {
-                lock (autoLock) {
-                    if (autoScan) {
-                        foreach (var interfaceType in interfaceTypes) {
-                            var ifScan = interfaceType.Scan();
-                            var newIfs = ifScan.Where(i => !interfaceType.interfaces.Contains(i));
-                            var removedIfs = interfaceType.interfaces.Where(i => !ifScan.Contains(i)).ToList();
-                            foreach (var i in newIfs) {
-                                interfaceType.interfaces.Add(i);
-                                OnInterfaceAdded(i);
-                            }
-                            foreach (var i in removedIfs) {
-                                interfaceType.interfaces.Remove(i);
-                                OnInterfaceRemoved(i);
-                            }
+        public void ScanInterface(Interface inf) {
+            if (inf.isEnabled) {
+                var delegateScanTask = new TaskCompletionSource<bool>();
+                OnInterfaceScanning(inf, delegateScanTask.Task);
+                Console.WriteLine($"Scanning {inf.info}");
 
-                            foreach (var inf in interfaceType.interfaces) {
-                                if (inf.isEnabled) {
-                                    var devScan = inf.Scan();
-                                    var newDevs = devScan.Where(d => !inf.devices.Contains(d));
-                                    var removedDevs = inf.devices.Where(d => !devScan.Contains(d)).ToList();
-                                    foreach (var d in newDevs) {
-                                        inf.devices.Add(d);
-                                        OnDeviceAdded(d);
-                                    }
-                                    foreach (var d in removedDevs) {
-                                        inf.devices.Remove(d);
-                                        OnDeviceRemoved(d);
-                                    }
-                                }
-                            }
-                        }
+                var scanTask = inf.Scan();
+                scanTask.Wait(3000);
+
+                delegateScanTask.SetResult(scanTask.IsCompleted);
+                if (scanTask.IsCompleted) {
+                    var devScan = scanTask.Result;
+                    Console.WriteLine($"Scanning {inf.info} done");
+                    var newDevs = devScan.Where(d => !inf.devices.Contains(d));
+                    var removedDevs = inf.devices.Where(d => !devScan.Contains(d)).ToList();
+                    foreach (var d in newDevs) {
+                        inf.devices.Add(d);
+                        OnDeviceAdded(inf, d);
                     }
+                    foreach (var d in removedDevs) {
+                        inf.devices.Remove(d);
+                        OnDeviceRemoved(inf, d);
+                    }
+                } else {
+                    Console.WriteLine($"Scanning {inf.info} timed out, retrying");
+#pragma warning disable CS4014
+                    Task.Run(async () => {
+                        await inf.Disable();
+                        await inf.Enable();
+                    });
+#pragma warning restore CS4014
+                }
+            }
+        }
+
+        public async void Scan() {
+            foreach (var interfaceType in interfaceTypes) {
+                Console.WriteLine($"Scanning {interfaceType.ToString()}");
+                var ifScan = await interfaceType.Scan();
+                var newIfs = ifScan.Where(i => !interfaceType.interfaces.Contains(i));
+                var removedIfs = interfaceType.interfaces.Where(i => !ifScan.Contains(i)).ToList();
+                var keptIfs = ifScan.Where(i => interfaceType.interfaces.Contains(i));
+
+                foreach (var i in newIfs) {
+                    interfaceType.interfaces.Add(i);
+                    OnInterfaceAdded(i);
+                }
+                foreach (var i in removedIfs) {
+                    interfaceType.interfaces.Remove(i);
+                    OnInterfaceRemoved(i);
                 }
 
+                foreach (var inf in interfaceType.interfaces) {
+                    ScanInterface(inf);
+                }
+            }
+        }
+        
+        void ScanningThreadFunc() {
+            while (autoScan) {
+                Scan();
                 Thread.Sleep(3000);
             }
         }
 
-        void SampleThread() {
-            while (true) {
-                lock (autoLock) {
-                    if (autoSample) {
-                        foreach (var interfaceType in interfaceTypes) {
-                            foreach (var inf in interfaceType.interfaces) {
-                                if (inf.isEnabled && inf.devices.Count() > 0) {
-                                    //foreach (var dev in inf.devices) {
-                                    //    dev.GetValue();
-                                    //}
-                                    var devVals = inf.devices.Zip(inf.GetValue(1), (dev, val) => new { dev, val });
-                                    foreach (var it in devVals) {
-                                        if (it.val.Length > 0)
-                                            OnDeviceValue(it.dev, it.val);
-
-                                        if (it.val.Length == 4)
-                                            OnDeviceValueFloat(it.dev, BitConverter.ToSingle(it.val, 0));
-                                    }
-                                }
+        async void SampleThreadFunc() {
+            while (autoSample) {
+                foreach (var interfaceType in interfaceTypes) {
+                    foreach (var inf in interfaceType.interfaces) {
+                        if (inf.isEnabled && inf.devices.Count() > 0) {
+                            Stopwatch sw = new Stopwatch();
+                            sw.Start();
+                            var samples = await inf.ReadStream(31);
+                            sw.Stop();
+                            //Console.WriteLine(sw.Elapsed);
+                            foreach (var sample in samples) {
+                                OnSample(inf, inf.devices[(int)sample.idx] as PeripheralDevice, sample);
                             }
                         }
                     }
                 }
-
-                Thread.Sleep(100);
+                Thread.Sleep(30);
             }
         }
 
         public delegate void OnInterfaceAddedDelegate(Interface inf);
         public OnInterfaceAddedDelegate OnInterfaceAdded = (i) => { };
+        public delegate void OnInterfaceScanningDelegate(Interface inf, Task scanEnded);
+        public OnInterfaceScanningDelegate OnInterfaceScanning = (i, t) => { };
         public delegate void OnInterfaceRemovedDelegate(Interface inf);
         public OnInterfaceRemovedDelegate OnInterfaceRemoved = (i) => { };
-        public delegate void OnDeviceAddedDelegate(Device dev);
-        public OnDeviceAddedDelegate OnDeviceAdded = (d) => { };
-        public delegate void OnDeviceRemovedDelegate(Device dev);
-        public OnDeviceRemovedDelegate OnDeviceRemoved = (d) => { };
-        public delegate void OnDeviceValueDelegate(Device dev, byte[] value);
-        public OnDeviceValueDelegate OnDeviceValue = (d, v) => { };
-        public delegate void OnDeviceValueFloatDelegate(Device dev, float value);
-        public OnDeviceValueFloatDelegate OnDeviceValueFloat = (d, v) => { };
+        public delegate void OnDeviceAddedDelegate(Interface inf, Device dev);
+        public OnDeviceAddedDelegate OnDeviceAdded = (i, d) => { };
+        public delegate void OnDeviceRemovedDelegate(Interface inf, Device dev);
+        public OnDeviceRemovedDelegate OnDeviceRemoved = (i, d) => { };
+        public delegate void OnSampleDelegate(Interface inf, PeripheralDevice dev, Sample value);
+        public OnSampleDelegate OnSample = (i, d, v) => { };
 
         public List<InterfaceType> interfaceTypes;
 
@@ -115,13 +139,35 @@ namespace libsv {
 
         public bool AutoScan {
             get { lock (autoLock) { return autoScan; } }
-            set { lock (autoLock) { autoScan = value; } }
+            set {
+                lock (autoLock) {
+                    if (!autoScan && value) {
+                        if (scanningThread != null) {
+                            scanningThread.Abort();
+                        }
+                        scanningThread = new Thread(ScanningThreadFunc);
+                        scanningThread.Start();
+                    }
+                    autoScan = value;
+                }
+            }
         }
 
         private bool autoSample = false;
         public bool AutoSample {
             get { lock (autoLock) { return autoSample; } }
-            set { lock (autoLock) { autoSample = value; } }
+            set {
+                lock (autoLock) {
+                    if (!autoSample && value) {
+                        if (sampleThread != null) {
+                            sampleThread.Abort();
+                        }
+                        sampleThread = new Thread(SampleThreadFunc);
+                        sampleThread.Start();
+                    }
+                    autoSample = value;
+                }
+            }
         }
     }
 }
