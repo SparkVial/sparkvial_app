@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:sparkvial_app"
+             x:Class="sparkvial_app.DevicesPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:IfTypeToIcon x:Key="ifTypeToIcon" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ListView SelectionMode="None"
+              x:Name="DevList"
+              HorizontalOptions="FillAndExpand"
+              VerticalOptions="FillAndExpand"
+              IsGroupingEnabled="True"
+              GroupDisplayBinding="{Binding Inf.Info}"
+              IsPullToRefreshEnabled="True"
+              Refreshing="Rescan"
+              WidthRequest="700"
+              ItemTapped="DevList_ItemTapped">
+        <ListView.Header>
+            <Label FontSize="Large" HorizontalTextAlignment="Center">
+                <Label.IsVisible>
+                    <OnPlatform x:TypeArguments="x:Boolean" Default="true">
+                        <OnPlatform.Platforms>
+                            <On Platform="UWP">false</On>
+                        </OnPlatform.Platforms>
+                    </OnPlatform>
+                </Label.IsVisible>
+                Devices
+            </Label>
+        </ListView.Header>
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <ViewCell>
+                    <StackLayout Orientation="Horizontal" Padding="15,5,15,5">
+                        <Label FontSize="18" VerticalTextAlignment="Center" LineBreakMode="TailTruncation" Text="{Binding Dev.Name}" />
+                        <Label FontSize="12" VerticalTextAlignment="Start" Opacity="0.4" Text="{Binding Dev.UniqueID, StringFormat='#{0:x}'}" />
+                        <Label FontSize="18" VerticalTextAlignment="Center" HorizontalOptions="EndAndExpand" Text="{Binding Value}" />
+                    </StackLayout>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+        <ListView.GroupHeaderTemplate>
+            <DataTemplate>
+                <ViewCell>
+                    <StackLayout Orientation="Horizontal" Margin="15,0,15,0">
+                        <Label FontSize="16"
+                               VerticalTextAlignment="Center"
+                               Text="{Binding Inf.Type, Converter={StaticResource ifTypeToIcon}}">
+                            <Label.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String">
+                                    <OnPlatform.Platforms>
+                                        <On Platform="Android">fa-solid.otf#Font Awesome 5 Free Solid</On>
+                                        <On Platform="iOS">Font Awesome 5 Free Solid</On>
+                                        <On Platform="UWP">Assets/fa-solid.otf#Font Awesome 5 Free</On>
+                                        <On Platform="WPF">fa-solid.otf#Font Awesome 5 Free</On>
+                                    </OnPlatform.Platforms>
+                                </OnPlatform>
+                            </Label.FontFamily>
+                        </Label>
+                        <Label FontSize="16"
+                               FontAttributes="Bold"
+                               VerticalTextAlignment="Center"
+                               HorizontalOptions="StartAndExpand"
+                               HorizontalTextAlignment="Start"
+                               LineBreakMode="TailTruncation"
+                               Text="{Binding Inf.Info}" />
+                        <Label FontSize="16" VerticalTextAlignment="Center" HorizontalOptions="End" Text="{Binding Status}" />
+                    </StackLayout>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.GroupHeaderTemplate>
+    </ListView>
+</ContentPage>

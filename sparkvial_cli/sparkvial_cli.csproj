@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AndroidDebug|AnyCPU'">
+    <OutputPath>bin\AndroidDebug\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,8 +54,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libsv\libsv.csproj">
-      <Project>{a8641768-f82b-4a39-8d20-cf96eca925db}</Project>
+      <Project>{e67b97cf-5f2b-4bc0-aac4-85f4f6f613f2}</Project>
       <Name>libsv</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\svifs_win32\svifs_win32.csproj">
+      <Project>{f36e688c-82c7-441f-9fff-9564cdf19b8c}</Project>
+      <Name>svifs_win32</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

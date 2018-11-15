@@ -1,14 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:sparkvial_app"
-             x:Class="sparkvial_app.MainPage">
-
-    <StackLayout>
-        <!-- Place new controls here -->
-        <Label Text="Welcome to Xamarin.Forms!" 
-           HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" />
-    </StackLayout>
-
-</ContentPage>
+<!--<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:sparkvial_app="clr-namespace:sparkvial_app"
+            x:Class="sparkvial_app.MainPage">
+    <TabbedPage.BarBackgroundColor>
+        <OnPlatform x:TypeArguments="Color">
+            <On Platform="Android, UWP, iOS">#292929</On>
+        </OnPlatform>
+    </TabbedPage.BarBackgroundColor>
+    <TabbedPage.BarTextColor>
+        <OnPlatform x:TypeArguments="Color">
+            <On Platform="Android, UWP, iOS">#FF7B0F</On>
+        </OnPlatform>
+    </TabbedPage.BarTextColor>
+    --><!--Pages can be added as references or inline--><!--
+    <sparkvial_app:DevicesPage x:Name="DevPage" Title="Devices"/>
+    <sparkvial_app:CodePage x:Name="CodePage" Title="Code"/>
+</TabbedPage>-->
+<MasterDetailPage xmlns="http://xamarin.com/schemas/2014/forms"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:sparkvial_app="clr-namespace:sparkvial_app"
+                  x:Class="sparkvial_app.MainPage"
+                  IsPresented="True"
+                  MasterBehavior="Popover">
+    <MasterDetailPage.Master>
+        <sparkvial_app:DevicesPage x:Name="DevPage" Title="Devices" />
+    </MasterDetailPage.Master>
+    <MasterDetailPage.Detail>
+        <NavigationPage>
+            <x:Arguments>
+                <sparkvial_app:GraphPage x:Name="GraphPage" Title="Graphs" />
+            </x:Arguments>
+        </NavigationPage>
+    </MasterDetailPage.Detail>
+</MasterDetailPage>

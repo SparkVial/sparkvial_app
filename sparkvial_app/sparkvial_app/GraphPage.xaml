@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:sparkvial_app"
+             xmlns:ttf="clr-namespace:TouchTracking.Forms;assembly=TouchTracking.Forms"
+             xmlns:skf="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
+             x:Class="sparkvial_app.GraphPage"
+             Title="Block view">
+    <local:GraphEditor x:Name="GraphEditor" IgnorePixelScaling="True">
+        <local:GraphEditor.Effects>
+            <ttf:TouchEffect Capture="True" TouchAction="OnTouch" />
+        </local:GraphEditor.Effects>
+    </local:GraphEditor>
+    <!--<skf:SKCanvasView x:Name="GraphEditor"></skf:SKCanvasView>-->
+    <!--<sk:SKCanvasView></sk:SKCanvasView>-->
+    <!--<Label Text="a"></Label>-->
+</ContentPage>
