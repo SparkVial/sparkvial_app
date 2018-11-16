@@ -3,6 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Configurations>Debug;Release;AndroidDebug</Configurations>
+    <Version>0.0.1</Version>
+    <PackageId>SparkVialApp</PackageId>
+    <Authors>David Shlemayev</Authors>
+    <Product>SparkVial</Product>
+    <PackageProjectUrl>https://sparkvial.github.io</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SparkVial/sparkvial_app</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
