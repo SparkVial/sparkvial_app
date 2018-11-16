@@ -59,7 +59,10 @@ namespace sparkvial_app {
         ListView devList;
         GraphEditor graphEditor;
         ObservableCollection<InterfaceWithStatus> infs = new ObservableCollection<InterfaceWithStatus>();
-        Dictionary<Interface, InterfaceWithStatus> infs_map = new Dictionary<Interface, InterfaceWithStatus>();
+        Dictionary<Interface, InterfaceWithStatus> infMap = new Dictionary<Interface, InterfaceWithStatus>();
+        Dictionary<PeripheralDevice, DeviceWithStringValue> devMap = new Dictionary<PeripheralDevice, DeviceWithStringValue>();
+        Dictionary<PeripheralDevice, SensorNode> devNodesMap = new Dictionary<PeripheralDevice, SensorNode>();
+        private Random pseudoRandomGen = new Random();
         
         public App(SparkVial sv) {
             this.sv = sv;
@@ -80,28 +83,38 @@ namespace sparkvial_app {
 
                 Xamarin.Forms.Device.BeginInvokeOnMainThread(() => {
                     var newInf = new InterfaceWithStatus(inf);
-                    infs_map[inf] = newInf;
+                    infMap[inf] = newInf;
+                    infMap[inf].Status = "Enabling...";
                     infs.Add(newInf);
-                    infs_map[inf].Status = "Enabling...";
                 });
             };
             sv.OnInterfaceScanning += async (inf, tsk) => {
                 Xamarin.Forms.Device.BeginInvokeOnMainThread(() => {
-                    infs_map[inf].Status = "Scanning...";
+                    infMap[inf].Status = "Scanning...";
                 });
                 await tsk;
                 Xamarin.Forms.Device.BeginInvokeOnMainThread(() => {
-                    infs_map[inf].Status = "Active";
+                    infMap[inf].Status = "Active";
                 });
             };
             sv.OnInterfaceRemoved += (inf) => {
                 Console.WriteLine($"- Interface of type {inf.type} removed: {inf.id}");
+                infs.Remove(infMap[inf]);
+                infMap.Remove(inf);
             };
             sv.OnDeviceAdded += (inf, dev) => {
                 Console.WriteLine($"- Device '{dev.name}' added with serial number {dev.uniqueID:X8}");
                 if (dev is PeripheralDevice pdev) {
                     Xamarin.Forms.Device.BeginInvokeOnMainThread(() => {
-                        infs_map[inf].Add(new DeviceWithStringValue(pdev));
+                        devMap[pdev] = new DeviceWithStringValue(pdev);
+                        infMap[inf].Add(devMap[pdev]);
+                        var randX = pseudoRandomGen.Next(-200, 200);
+                        var randY = pseudoRandomGen.Next(-200, 200);
+                        devNodesMap[pdev] = new SensorNode(pdev.Name, "Number", "Units", graphEditor.Graph) {
+                            pos = new SKPoint(300 + randX, 200 + randY)
+                        };
+
+                        graphEditor.Graph.nodes.Add(devNodesMap[pdev]);
                     });
                 }
                 dev.AdjustInterval(100);  // in ms
@@ -110,7 +123,11 @@ namespace sparkvial_app {
                 Console.WriteLine($"- Device '{dev.name}' with serial number {dev.uniqueID:X8} removed");
                 if (dev is PeripheralDevice pdev) {
                     Xamarin.Forms.Device.BeginInvokeOnMainThread(() => {
-                        infs_map[inf].Remove(new DeviceWithStringValue(pdev));
+                        // TODO: Remove all graph node connections.
+                        graphEditor.Graph.nodes.Remove(devNodesMap[pdev]);
+                        devNodesMap.Remove(pdev);
+                        infMap[inf].Remove(devMap[pdev]);
+                        devMap.Remove(pdev);
                     });
                 }
             };
@@ -119,7 +136,7 @@ namespace sparkvial_app {
                 string formattedValue = DeviceLogics.Get(dev.productID).FormatValue(smp);
                 
                 Xamarin.Forms.Device.BeginInvokeOnMainThread(() => {
-                    infs_map[inf][(int)dev.index].Value = formattedValue;
+                    infMap[inf][(int)dev.index].Value = formattedValue;
                 });
             };
 
@@ -134,19 +151,24 @@ namespace sparkvial_app {
             //    data = new Queue<float>(new float[] { 1, 2, 3, 4, 5, 4, 3, 2, 1 })
             //};
 
-            graphEditor.Graph.nodes.Add(new SensorNode("Temperature Sensor", "Number", "C", graphEditor.Graph) {
-                pos = new SKPoint(300, 170)
-            });
+            //graphEditor.Graph.nodes.Add(new SensorNode("Temperature Sensor", "Number", "C", graphEditor.Graph) {
+            //    pos = new SKPoint(300, 170)
+            //});
 
-            graphEditor.Graph.nodes.Add(new SensorNode("Light Sensor", "Number", "Lux", graphEditor.Graph) {
-                pos = new SKPoint(300, 230)
-            });
+            //graphEditor.Graph.nodes.Add(new SensorNode("Light Sensor", "Number", "Lux", graphEditor.Graph) {
+            //    pos = new SKPoint(300, 230)
+            //});
 
             graphEditor.Graph.nodes.Add(new AddNode(graphEditor.Graph) {
                 pos = new SKPoint(600, 200)
             });
 
-            graphEditor.Graph.nodes.Add(new ChartNode(graphEditor.Graph) {
+            var data = new Queue<Tuple<float, float>>();
+            var iter = 0;
+            foreach (var num in new float[] { 1, 2, 3, 4, 5, 4, 3, 0, -1 }) {
+                data.Enqueue(new Tuple<float, float>(iter++, num));
+            }
+            graphEditor.Graph.nodes.Add(new ChartNode(graphEditor.Graph, data) {
                 pos = new SKPoint(750, 300)
             });
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SkiaSharp;
+using sparkvial_app.rows;
 
 namespace sparkvial_app.nodes {
     public static class NodeTypes {
@@ -79,41 +80,4 @@ namespace sparkvial_app.nodes {
             }
         }
     }
-
-
-    public class ChartNode : BaseNode {
-        public string unit = "";
-        public Queue<float> data;
-
-        public ChartNode(Graph parentGraph) {
-            Rows = new List<BaseRow> {
-                new InputRow("Chart", "Number", this),
-                new ChartRow()
-            };
-            this.parentGraph = parentGraph;
-        }
-    }
-
-    public class SensorNode : BaseNode {
-        public string unit;
-
-        public SensorNode(string name, string type, string unit, Graph parentGraph) {
-            Rows = new List<BaseRow> {
-                new OutputRow(name, type, this),
-            };
-            this.unit = unit;
-            this.parentGraph = parentGraph;
-        }
-    }
-
-    public class AddNode : BaseNode {
-        public AddNode(Graph parentGraph) {
-            Rows = new List<BaseRow> {
-                new InputRow("A", "Number", this),
-                new InputRow("B", "Number", this),
-                new OutputRow("A + B", "Number", this)
-            };
-            this.parentGraph = parentGraph;
-        }
-    };
 }

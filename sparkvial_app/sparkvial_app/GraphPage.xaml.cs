@@ -1,4 +1,4 @@
-﻿using TouchTracking;
+﻿using SkiaSharp.Views.Forms;
 using Xamarin.Forms;
 
 namespace sparkvial_app {
@@ -8,8 +8,16 @@ namespace sparkvial_app {
             //NavigationPage.SetHasNavigationBar(this, false);
         }
 
-        public void OnTouch(object sender, TouchActionEventArgs args) {
-            this.FindByName<GraphEditor>("GraphEditor").OnInteract(sender, args);
+        public void OnTouch(object sender, SKTouchEventArgs e) {
+            this.FindByName<GraphEditor>("GraphEditor").OnInteract(sender, e);
+        }
+
+        private void OnPan(object sender, PanUpdatedEventArgs e) {
+            this.FindByName<GraphEditor>("GraphEditor").OnPan(sender, e);
+        }
+
+        private void OnPinch(object sender, PinchGestureUpdatedEventArgs e) {
+            this.FindByName<GraphEditor>("GraphEditor").OnPinch(sender, e);
         }
     }
 }

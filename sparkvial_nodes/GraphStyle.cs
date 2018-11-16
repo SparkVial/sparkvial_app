@@ -65,6 +65,48 @@ namespace sparkvial_app.nodes {
             IsAntialias = true
         };
 
+        public static readonly SKPaint ChartFaintLinePaint = new SKPaint {
+            Style = SKPaintStyle.Fill,
+            Color = Color.FromRgb(180, 180, 180).ToSKColor(),
+            StrokeWidth = 1.5f,
+            TextSize = 14,
+            IsAntialias = true
+        };
+
+        public static readonly SKPaint ChartBoldLinePaint = new SKPaint {
+            Style = SKPaintStyle.Fill,
+            Color = Color.FromRgb(245, 245, 245).ToSKColor(),
+            StrokeWidth = 3,
+            TextSize = 14,
+            IsAntialias = true
+        };
+
+        public static readonly SKPaint ChartCenteredBoldLinePaint = new SKPaint {
+            Style = SKPaintStyle.Fill,
+            Color = Color.FromRgb(245, 245, 245).ToSKColor(),
+            StrokeWidth = 3,
+            TextSize = 14,
+            TextAlign = SKTextAlign.Center,
+            IsAntialias = true
+        };
+
+        public static readonly SKPaint ChartShadowLinePaint = new SKPaint {
+            Style = SKPaintStyle.StrokeAndFill,
+            Color = Color.FromRgb(88, 88, 88).ToSKColor(),
+            StrokeWidth = 5,
+            TextSize = 14,
+            IsAntialias = true
+        };
+
+        public static readonly SKPaint ChartCenteredShadowLinePaint = new SKPaint {
+            Style = SKPaintStyle.StrokeAndFill,
+            Color = Color.FromRgb(88, 88, 88).ToSKColor(),
+            StrokeWidth = 5,
+            TextSize = 14,
+            TextAlign = SKTextAlign.Center,
+            IsAntialias = true
+        };
+
         public static readonly SKPaint FadedInputPaint = new SKPaint {
             Style = SKPaintStyle.Fill,
             Color = Color.FromRgba(0, 162, 232, FadeOpacity).ToSKColor(),
