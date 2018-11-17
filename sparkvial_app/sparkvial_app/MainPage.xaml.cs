@@ -5,7 +5,6 @@ namespace sparkvial_app {
     public partial class MainPage : MasterDetailPage {
         public MainPage() {
             InitializeComponent();
-            //NavigationPage.SetHasNavigationBar(this, false);
         }
     }
 }

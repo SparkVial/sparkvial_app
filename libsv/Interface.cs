@@ -32,6 +32,8 @@ namespace libsv {
         /// </summary>
         public readonly string type;
 
+        public object scanLock = new object();
+
         public byte timestampSize = 2;
         public byte timestampResolution = 1;
 

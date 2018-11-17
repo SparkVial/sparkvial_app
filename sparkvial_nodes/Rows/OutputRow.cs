@@ -1,7 +1,8 @@
 ﻿using SkiaSharp;
-using sparkvial_app.rows;
+using sparkvial.rows;
+using sparkvial_app;
 
-namespace sparkvial_app.nodes {
+namespace sparkvial.nodes {
     public class OutputRow : ConnectorRow {
         public static bool Fade = false;
 

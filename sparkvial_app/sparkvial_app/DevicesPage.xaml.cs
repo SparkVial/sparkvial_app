@@ -14,7 +14,7 @@ namespace sparkvial_app {
         }
 
         private void DevList_ItemTapped(object sender, ItemTappedEventArgs e) {
-            if (e.Item is DeviceWithStringValue dev) {
+            if (e.Item is DeviceWithValue dev) {
                 Console.WriteLine(DeviceLogics.Get(dev.Dev.ProductID));
             }
         }

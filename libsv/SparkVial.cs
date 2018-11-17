@@ -13,13 +13,13 @@ namespace libsv {
         public const uint PatchVersion = 0;
         public const byte ProtocolVersion = 0;
 
-        public static readonly Dictionary<uint, string> productDB = new Dictionary<uint, string>() {
-            { 0, "MISSING PRODUCT ID" },
-            { 0 << 16 | 1, "Mock controller" },
-            { 0 << 16 | 2, "Mock device" },
-            { 1 << 16 | 1, "Example controller" },
-            { 1 << 16 | 2, "Example device" },
-        };
+        //public static readonly Dictionary<uint, string> productDB = new Dictionary<uint, string>() {
+        //    { 0, "MISSING PRODUCT ID" },
+        //    { 0 << 16 | 1, "Mock controller" },
+        //    { 0 << 16 | 2, "Mock device" },
+        //    { 1 << 16 | 1, "Example controller" },
+        //    { 1 << 16 | 2, "Example device" },
+        //};
 
         public Thread scanningThread;
         public Thread sampleThread;
@@ -35,36 +35,38 @@ namespace libsv {
         }
 
         public void ScanInterface(Interface inf) {
-            if (inf.isEnabled) {
-                var delegateScanTask = new TaskCompletionSource<bool>();
-                OnInterfaceScanning(inf, delegateScanTask.Task);
-                Console.WriteLine($"Scanning {inf.info}");
+            lock (inf.scanLock) {
+                if (inf.isEnabled) {
+                    var delegateScanTask = new TaskCompletionSource<bool>();
+                    OnInterfaceScanning(inf, delegateScanTask.Task);
+                    Console.WriteLine($"Scanning {inf.info}");
 
-                var scanTask = inf.Scan();
-                scanTask.Wait(3000);
+                    var scanTask = inf.Scan();
+                    scanTask.Wait(3000);
 
-                delegateScanTask.SetResult(scanTask.IsCompleted);
-                if (scanTask.IsCompleted) {
-                    var devScan = scanTask.Result;
-                    Console.WriteLine($"Scanning {inf.info} done");
-                    var newDevs = devScan.Where(d => !inf.devices.Contains(d));
-                    var removedDevs = inf.devices.Where(d => !devScan.Contains(d)).ToList();
-                    foreach (var d in newDevs) {
-                        inf.devices.Add(d);
-                        OnDeviceAdded(inf, d);
+                    delegateScanTask.SetResult(scanTask.IsCompleted);
+                    if (scanTask.IsCompleted) {
+                        var devScan = scanTask.Result;
+                        Console.WriteLine($"Scanning {inf.info} done");
+                        var newDevs = devScan.Where(d => !inf.devices.Contains(d));
+                        var removedDevs = inf.devices.Where(d => !devScan.Contains(d)).ToList();
+                        foreach (var d in newDevs) {
+                            inf.devices.Add(d);
+                            OnDeviceAdded(inf, d);
+                        }
+                        foreach (var d in removedDevs) {
+                            inf.devices.Remove(d);
+                            OnDeviceRemoved(inf, d);
+                        }
+                    } else {
+                        Console.WriteLine($"Scanning {inf.info} timed out, retrying");
+    #pragma warning disable CS4014
+                        Task.Run(async () => {
+                            await inf.Disable();
+                            await inf.Enable();
+                        });
+    #pragma warning restore CS4014
                     }
-                    foreach (var d in removedDevs) {
-                        inf.devices.Remove(d);
-                        OnDeviceRemoved(inf, d);
-                    }
-                } else {
-                    Console.WriteLine($"Scanning {inf.info} timed out, retrying");
-#pragma warning disable CS4014
-                    Task.Run(async () => {
-                        await inf.Disable();
-                        await inf.Enable();
-                    });
-#pragma warning restore CS4014
                 }
             }
         }

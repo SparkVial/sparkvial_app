@@ -1,8 +1,8 @@
 ﻿using System;
 using SkiaSharp;
 using SkiaSharp.Views.Forms;
-using sparkvial_app.nodes;
-using sparkvial_app.rows;
+using sparkvial.nodes;
+using sparkvial.rows;
 using Xamarin.Forms;
 
 namespace sparkvial_app {
@@ -170,6 +170,10 @@ namespace sparkvial_app {
 
         #endregion
 
+        void OnNewConnection(GraphConnection conn) {
+
+        }
+
         void Paint(object sender, SKPaintSurfaceEventArgs args) {
             var canvas = args.Surface.Canvas;
             canvas.Clear();
@@ -225,16 +229,6 @@ namespace sparkvial_app {
                 canvas.DrawCircle(p1, GraphStyle.RowHeight * 0.4f * 0.5f, GraphStyle.ConnectionPaint);
                 canvas.DrawCircle(p2, GraphStyle.RowHeight * 0.4f * 0.5f, GraphStyle.ConnectionPaint);
                 canvas.DrawLine(p1, p2, GraphStyle.ConnectionPaint);
-
-                //var x = currentInteractingNode.x + 0.5 * GraphStyle.HandleWidth;
-                //var y = currentInteractingNode.y + (currentInteractingHandle + 0.5) * GraphStyle.RowHeight;
-                //if ((currentInteractingNode.type as GraphNodeType).handles[currentInteractingHandle].type == GraphNodeHandleType.Output) {
-                //    x += CalculateNodeWidth(currentInteractingNode) - GraphStyle.HandleWidth;
-                //}
-                //var p = new SKPoint((float)x - OffsetX, (float)y - OffsetY);
-                //var interactPosScaled = new SKPoint(currentInteractPos.X / canvasScale, currentInteractPos.Y / canvasScale);
-                //canvas.DrawCircle(interactPosScaled, GraphStyle.RowHeight * 0.4f * 0.5f, GraphStyle.ConnectionPaint);
-
             }
 
             // Draw debug text

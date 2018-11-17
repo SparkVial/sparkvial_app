@@ -1,10 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using SkiaSharp;
 
-namespace sparkvial_app.nodes {
+namespace sparkvial.nodes {
+    public static class ExtensionMethods {
+        public static bool Exists<T>(this ObservableCollection<T> collection, Predicate<T> match) {
+            if (match == null) {
+                throw new ArgumentNullException("match");
+            }
+
+            foreach (var elem in collection) {
+                if (match(elem))
+                    return true;
+            }
+            return false;
+        }
+
+        public static int RemoveAll<T>(this ObservableCollection<T> collection, Predicate<T> match) {
+            if (match == null) {
+                throw new ArgumentNullException("match");
+            }
+
+            var toRemove = collection.Where(entity => match(entity)).ToList();
+            toRemove.ForEach(entity => collection.Remove(entity));
+            return toRemove.Count;
+        }
+    }
+
     public class Graph {
         public List<object> nodes = new List<object>();
-        public List<GraphConnection> connections = new List<GraphConnection>();
+        public ObservableCollection<GraphConnection> connections = new ObservableCollection<GraphConnection>();
 
         public static BaseNode currentlyInteractingNode = null;
         public static int currentlyInteractingRow = -1;

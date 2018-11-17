@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using libsv.devices;
 
 namespace libsv {
     public class Device {
@@ -7,14 +8,19 @@ namespace libsv {
         public readonly uint uniqueID;
         public readonly uint index;
         public readonly string name;
+        public readonly string vendor;
         public readonly DeviceClass cls;
         private readonly Interface inf;
 
         // Fields for xaml bindings
         public string Name => name;
+        public string Vendor => vendor;
         public uint Index => index;
         public uint UniqueID => uniqueID;
         public uint ProductID => productID;
+
+        // Properties about a device
+        public uint Interval { get; private set; }
 
         public Device(Interface inf, uint productID, uint uniqueID, uint index, DeviceClass cls) {
             this.inf = inf;
@@ -22,10 +28,13 @@ namespace libsv {
             this.uniqueID = uniqueID;
             this.index = index;
             this.cls = cls;
-            name = SparkVial.productDB.ContainsKey(productID) ? SparkVial.productDB[productID] : $"{productID:X8}";
+            var nameAndVendor = DeviceDB.Get(productID);
+            name = nameAndVendor.Item1;
+            vendor = nameAndVendor.Item2;
         }
 
         public void AdjustInterval(uint interval) {
+            Interval = interval;
             inf.AdjustInterval(index, interval);
         }
 

@@ -5,8 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="morelinq" Version="3.0.0" />
     <PackageReference Include="SkiaSharp" Version="1.60.3" />
     <PackageReference Include="SkiaSharp.Views.Forms" Version="1.60.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\libsv\libsv.csproj" />
+    <ProjectReference Include="..\sparkvial_tapes\sparkvial_tapes.csproj" />
   </ItemGroup>
 
 </Project>

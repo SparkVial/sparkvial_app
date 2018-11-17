@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using SkiaSharp;
-using sparkvial_app.rows;
+using sparkvial.rows;
 
-namespace sparkvial_app.nodes {
+namespace sparkvial.nodes {
     public static class NodeTypes {
-        public readonly static List<Type> list = new List<Type>() { };
+        public static readonly List<Type> list = new List<Type>() { };
     }
 
     public abstract class BaseNode {

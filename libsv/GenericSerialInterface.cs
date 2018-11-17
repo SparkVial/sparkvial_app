@@ -152,7 +152,7 @@ namespace libsv {
                                         throw new NotImplementedException("Double fields are not implemented");
                                 }
                             }
-                            samples.Add(new Sample(devIdx, timestamp, values));
+                            samples.Add(new Sample(this, devIdx, timestamp, values));
                         }
                     }
                 }

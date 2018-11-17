@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using sparkvial_app.rows;
+using sparkvial.rows;
 
-namespace sparkvial_app.nodes {
+namespace sparkvial.nodes {
     public class AddNode : BaseNode {
         public AddNode(Graph parentGraph) {
             Rows = new List<BaseRow> {

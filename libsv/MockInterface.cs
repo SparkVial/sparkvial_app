@@ -43,9 +43,10 @@ namespace libsv {
             throw new NotImplementedException();
         }
 
+        private ulong i = 0;
         public override Task<List<Sample>> ReadStream(byte readSize) {
             return Task.FromResult(new List<Sample>() {
-                new Sample(0, 1, new List<Field>() { new FloatField((float)rand.NextDouble()) })
+                new Sample(this, 0, i++, new List<Field>() { new FloatField((float)rand.NextDouble() / 5 + (float)Math.Sin(DateTime.Now.Ticks / 50000) + 1) })
             });
         }
 
@@ -60,7 +61,7 @@ namespace libsv {
         public override void Write(uint idx, byte[] value) {
             throw new NotImplementedException();
         }
-        
+
         public override bool Equals(object obj) {
             if (!(obj is MockInterface item)) {
                 return false;

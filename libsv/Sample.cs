@@ -32,11 +32,13 @@ namespace libsv {
     }
 
     public class Sample {
+        public Interface device;
         public ulong idx;
         public ulong timestamp;
         public List<Field> values;
 
-        public Sample(uint idx, ulong timestamp, List<Field> values) {
+        public Sample(Interface device, uint idx, ulong timestamp, List<Field> values) {
+            this.device = device;
             this.idx = idx;
             this.timestamp = timestamp;
             this.values = values;

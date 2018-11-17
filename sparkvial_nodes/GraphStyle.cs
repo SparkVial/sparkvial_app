@@ -2,7 +2,7 @@
 using SkiaSharp.Views.Forms;
 using Xamarin.Forms;
 
-namespace sparkvial_app.nodes {
+namespace sparkvial.nodes {
     public static class GraphStyle {
         public static float ChartMinWidth = 360;
         public static float ChartHeight = 200;

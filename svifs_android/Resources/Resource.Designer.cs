@@ -2448,12 +2448,6 @@ namespace svifs_android
 			// aapt resource value: 0x7f060010
 			public static int abc_toolbar_collapse_description = 2131099664;
 			
-			// aapt resource value: 0x7f060022
-			public static int app_name = 2131099682;
-			
-			// aapt resource value: 0x7f060021
-			public static int hello = 2131099681;
-			
 			// aapt resource value: 0x7f060011
 			public static int search_menu_title = 2131099665;
 			

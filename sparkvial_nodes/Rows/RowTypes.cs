@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using SkiaSharp;
-using sparkvial_app.nodes;
+using sparkvial.nodes;
 
-namespace sparkvial_app.rows {
+namespace sparkvial.rows {
     public static class RowTypes {
         public readonly static List<Type> list = new List<Type>() { };
     }

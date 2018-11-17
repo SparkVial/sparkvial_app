@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using sparkvial_app.rows;
+using sparkvial.tapes;
+using sparkvial.rows;
 
-namespace sparkvial_app.nodes {
+namespace sparkvial.nodes {
     public class ChartNode : BaseNode {
         public string unit = "";
-        public Queue<Tuple<float, float>> data;
+        public CacheTape tape;
 
-        public ChartNode(Graph parentGraph, Queue<Tuple<float, float>> data) {
+        public ChartNode(Graph parentGraph) {
+            var inputRow = new InputRow("Chart", "Number", this);
+            var chartRow = new ChartRow();
             Rows = new List<BaseRow> {
-                new InputRow("Chart", "Number", this),
-                new ChartRow(data)
+                inputRow,
+                chartRow
             };
             this.parentGraph = parentGraph;
-            this.data = data;
+            tape = chartRow.tape;
+            inputRow.inputTape = tape;
         }
     }
 }

@@ -67,9 +67,10 @@ namespace sparkvial_app.UWP
             //    ;
             //};
 
-            var cmdBar1 = VisualTreeHelper.GetChild(this, 0) as Canvas;
-            var cmdBar2 = VisualTreeHelper.GetChild(cmdBar1, 0) as MasterDetailControl;
-            var styl = new Windows.UI.Xaml.Style(typeof(MasterDetailControl));
+            //var cmdBar1 = VisualTreeHelper.GetChild(this, 0) as Canvas;
+            //var cmdBar2 = VisualTreeHelper.GetChild(cmdBar1, 0) as MasterDetailControl;
+            //var styl = new Windows.UI.Xaml.Style(typeof(MasterDetailControl));
+
             //styl.BasedOn = Xamarin.Forms.Platform.UWP.MasterDetailControl;
             //styl.Setters.Add(new Windows.UI.Xaml.Setter(MasterDetailControl.ToolbarBackgroundProperty, new SolidColorBrush(Windows.UI.Color.FromArgb(255, 127, 0, 64))));
             //cmdBar2.Style = styl;

@@ -175,6 +175,10 @@
       <Project>{e67b97cf-5f2b-4bc0-aac4-85f4f6f613f2}</Project>
       <Name>libsv</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\sparkvial_tapes\sparkvial_tapes.csproj">
+      <Project>{762baef2-1d47-47f7-80bc-29930e0e2d00}</Project>
+      <Name>sparkvial_tapes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\svifs_uwp\svifs_uwp.csproj">
       <Project>{5c4cd3b0-fd2e-482e-a364-2bba0603065e}</Project>
       <Name>svifs_uwp</Name>
