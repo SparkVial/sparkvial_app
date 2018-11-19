@@ -5,12 +5,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:sparkvial_app.UWP">
     <Application.Resources>
-        <!--<ResourceDictionary>
-            <Style TargetType="FormsCommandBar">
-                --><!--<Setter Property="Background" Value="{ThemeResource ApplicationPageBackgroundThemeBrush}" />--><!--
-                <Setter Property="Opacity" Value="0.7"></Setter>
-            </Style>
-        </ResourceDictionary>-->
         <ResourceDictionary>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
@@ -34,6 +28,10 @@
                         <Setter Property="OpenPaneLength" Value="420" />
                         <Setter Property="PaneBackground" Value="{ThemeResource SensibleAcrylicBrush}" />
                     </Style>
+                    <!--<Style TargetType="CommandBar">
+                        <Setter Property="Background" Value="Aqua" />
+                        <Setter Property="Opacity" Value="0.7"></Setter>
+                    </Style>-->
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>

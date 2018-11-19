@@ -48,18 +48,17 @@ namespace sparkvial.rows {
 
                 var minimumFound = filtered.Select((f, i) => Tuple.Create(i, f)).MinBy(f => f.Item2.Item2).First();
                 var minimum = minimumFound.Item2.Item2;
+                var minimumPadded = Math.Min(-0.2f, minimum - 0.5f);
                 var minimumIdx = minimumFound.Item1;
 
                 var maximumFound = filtered.Select((f, i) => Tuple.Create(i, f)).MaxBy(f => f.Item2.Item2).First();
                 var maximum = maximumFound.Item2.Item2;
+                var maximumPadded = Math.Max(maximum + 0.5f, 0.2f);
                 var maximumIdx = maximumFound.Item1;
 
-                minimum = Math.Min(-0.2f, minimum - 0.5f);
-                maximum = Math.Max(maximum + 0.5f, 0.2f);
-
                 // Draw the zero line
-                if (minimum <= 0 && maximum > 0) {
-                    var zeroHeight = Math.Abs(minimum) / Math.Abs(maximum - minimum);
+                if (minimumPadded <= 0 && maximumPadded > 0) {
+                    var zeroHeight = Math.Abs(minimumPadded) / Math.Abs(maximumPadded - minimumPadded);
                     canvas.DrawLine(
                         new SKPoint(x, y + GraphStyle.ChartHeight * (1 - zeroHeight)),
                         new SKPoint(x + width, y + GraphStyle.ChartHeight * (1 - zeroHeight)),
@@ -76,9 +75,9 @@ namespace sparkvial.rows {
                 //var next = dataEnum.Current;
                 for (var i = 0; i < tapeSnapshot.Count() - 1; i++) {
                     var x1Pos = (tapeSnapshot[i].timestamp - minimumTs) / Math.Abs(maximumTs - minimumTs);
-                    var y1Pos = ((tapeSnapshot[i].values[0] as FloatField).value - minimum) / Math.Abs(maximum - minimum);
+                    var y1Pos = ((tapeSnapshot[i].values[0] as FloatField).value - minimumPadded) / Math.Abs(maximumPadded - minimumPadded);
                     var x2Pos = (tapeSnapshot[i+1].timestamp - minimumTs) / Math.Abs(maximumTs - minimumTs);
-                    var y2Pos = ((tapeSnapshot[i+1].values[0] as FloatField).value - minimum) / Math.Abs(maximum - minimum);
+                    var y2Pos = ((tapeSnapshot[i+1].values[0] as FloatField).value - minimumPadded) / Math.Abs(maximumPadded - minimumPadded);
                     canvas.DrawLine(
                         new SKPoint(x + width * x1Pos, y + GraphStyle.ChartHeight * (1 - y1Pos)),
                         new SKPoint(x + width * x2Pos, y + GraphStyle.ChartHeight * (1 - y2Pos)),
@@ -95,7 +94,7 @@ namespace sparkvial.rows {
                     var i = 0;
                     foreach (var smp in tape) {
                         var xPos = (smp.timestamp - minimumTs) / Math.Abs(maximumTs - minimumTs);
-                        var yPos = ((smp.values[0] as FloatField).value - minimum) / Math.Abs(maximum - minimum);
+                        var yPos = ((smp.values[0] as FloatField).value - minimumPadded) / Math.Abs(maximumPadded - minimumPadded);
                         canvas.DrawCircle(
                             new SKPoint(x + width * xPos, y + GraphStyle.ChartHeight * (1 - yPos)),
                             2,

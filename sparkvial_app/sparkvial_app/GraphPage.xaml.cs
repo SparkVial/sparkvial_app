@@ -1,4 +1,5 @@
-﻿using SkiaSharp.Views.Forms;
+﻿using System.Diagnostics;
+using SkiaSharp.Views.Forms;
 using Xamarin.Forms;
 
 namespace sparkvial_app {
@@ -18,6 +19,10 @@ namespace sparkvial_app {
 
         private void OnPinch(object sender, PinchGestureUpdatedEventArgs e) {
             this.FindByName<GraphEditor>("GraphEditor").OnPinch(sender, e);
+        }
+
+        private async void OnExport(object sender, ClickedEventArgs e) {
+            Debug.Print("Exporting\n");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,10 +21,11 @@ namespace libsv {
         }
 
         public override async Task<bool> Enable() {
+            Debug.Print("Enabling\n");
             if (!await port.Open(115200)) {
                 return false;
             }
-            await Task.Delay(3000);
+            await Task.Delay(4000);
             port.Flush();
             isEnabled = true;
 
@@ -32,12 +34,14 @@ namespace libsv {
         }
 
         public override Task Disable() {
+            Debug.Print("Disabling\n");
             isEnabled = false;
             port.Close();
             return Task.CompletedTask;
         }
 
         public override async Task<List<Device>> Scan() {
+            Debug.Print("Scanning\n");
             // TODO: Handle mid-scan disconnects
             var output = new List<Device>();
 
@@ -49,16 +53,16 @@ namespace libsv {
             //    throw new ArgumentException($"timestampResolution cannot be higher than {0b1111}.");
             //}
 
-            Console.Write("  Scan init");
+            Debug.Print("Scan init\n");
             try {
-                port.Flush(); // Flush previous output
+                //port.Flush(); // Flush previous output
                 port.WriteByte((byte)((byte)Command.Scan | timestampSize));
                 port.WriteByte((byte)(timestampResolution & 0xF));
                 //await Task.Delay(200);
                 uint index_counter = 0;
                 byte moreDevs;
                 do {
-                    Console.Write("  1111");
+                    Debug.Print("moredevs?\n");
                     byte devClass = moreDevs = await port.ReadByte();
                     devClass &= 1;
 
@@ -123,10 +127,16 @@ namespace libsv {
             }
 
             try {
-                port.Flush(); // Flush previous output
+                //port.Flush(); // Flush previous output
                 port.WriteByte((byte)((byte)Command.ReadStream | readSize));
 
                 var sampleCount = await port.ReadByte();
+                //sampleCount = await port.ReadByte();
+                //sampleCount = await port.ReadByte();
+                //sampleCount = await port.ReadByte();
+                //sampleCount = await port.ReadByte();
+                //sampleCount = await port.ReadByte();
+                //sampleCount = await port.ReadByte();
                 var samples = new List<Sample>();
                 for (int i = 0; i < sampleCount; i++) {
                     var devIdx = (uint) await ReadVarint(0, await port.ReadByte());
@@ -165,11 +175,13 @@ namespace libsv {
 
         // TODO
         public override void Write(uint idx, byte[] value) {
+            Debug.Print("Writing\n");
             throw new NotImplementedException();
         }
 
         // TODO
         public override async Task<bool> Heartbeat() {
+            Debug.Print("Heartbeating\n");
             try {
                 /*
                  a: 1 bit = challenge >> 0
@@ -215,6 +227,7 @@ namespace libsv {
 
         // FIXME
         public override void AdjustInterval(uint index, uint interval) {
+            Debug.Print("Adjusting\n");
             port.WriteByte((byte)Command.AdjustInterval);
             var bInterval = new byte[4];
             bInterval[0] = (byte)((byte)interval & 0xFF);

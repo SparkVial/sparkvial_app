@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using libsv;
+using MoreLinq;
 
 namespace sparkvial.tapes {
     public class CacheTape : IdentityTape {
@@ -11,6 +13,12 @@ namespace sparkvial.tapes {
         public override ulong MaxTimestamp { get => maxTimestamp; }
 
         public CacheTape(Tape sourceTape) : base(sourceTape) { }
+
+        private new void UpdateInfo(Sample smp) {
+            base.UpdateInfo(smp);
+            //minTimestamp = cache.Select(s => s.timestamp).Min();
+            //maxTimestamp = cache.Select(s => s.timestamp).Min();
+        }
 
         private bool ShouldClean(ulong currTimestamp) {
             if (timeToLive != 0 && cache.Count != 0 && cache.Last.Value.timestamp < MaxTimestamp - timeToLive) {
@@ -30,8 +38,7 @@ namespace sparkvial.tapes {
                 UpdateInfo(cache.Last.Value);
             }
         }
-
-        // FIXME: Bug here
+        
         private void Synchronize() {
             lock (this) {
                 var src = sourceTape.GetEnumerator();
@@ -43,7 +50,7 @@ namespace sparkvial.tapes {
                         if (currentNode == null) {
                             currentNode = cache.AddFirst(value);
                         } else {
-                            currentNode = cache.AddAfter(currentNode, value); // here
+                            currentNode = cache.AddAfter(currentNode, value);
                         }
                         UpdateInfo(value);
                     }

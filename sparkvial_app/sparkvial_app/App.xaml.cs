@@ -135,7 +135,7 @@ namespace sparkvial_app {
                         graphEditor.Graph.nodes.Add(devNodesMap[pdev]);
                     });
                 }
-                dev.AdjustInterval(100 /*ms*/);
+                dev.AdjustInterval(50 /*ms*/);
             };
 
             // When a device gets removed remove it's graph node.
@@ -179,6 +179,12 @@ namespace sparkvial_app {
             graphEditor.Graph.nodes.Add(new ChartNode(graphEditor.Graph) {
                 pos = new SKPoint(750, 300)
             });
+            graphEditor.Graph.nodes.Add(new ChartNode(graphEditor.Graph) {
+                pos = new SKPoint(750, 600)
+            });
+            graphEditor.Graph.nodes.Add(new ChartNode(graphEditor.Graph) {
+                pos = new SKPoint(750, 900)
+            });
 
             graphEditor.Graph.connections.CollectionChanged += ConnectionsChanged;
 
@@ -219,6 +225,10 @@ namespace sparkvial_app {
                     }
                 }
             }
+        }
+
+        public void OnExport() {
+
         }
 
         protected override void OnStart() {

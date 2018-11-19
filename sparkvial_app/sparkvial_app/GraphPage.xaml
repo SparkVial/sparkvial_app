@@ -4,7 +4,11 @@
              xmlns:local="clr-namespace:sparkvial_app"
              xmlns:skf="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
              x:Class="sparkvial_app.GraphPage"
-             Title="Block view">
+             Title="Graphs">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Icon="Assets/record.png" Name="Record" Priority="1" />
+        <ToolbarItem Icon="Assets/export.png" Name="Export" Priority="2" Clicked="OnExport" />
+    </ContentPage.ToolbarItems>
     <local:GraphEditor x:Name="GraphEditor" IgnorePixelScaling="False" Touch="OnTouch" EnableTouchEvents="True">
         <local:GraphEditor.GestureRecognizers>
             <PanGestureRecognizer PanUpdated="OnPan"/>
